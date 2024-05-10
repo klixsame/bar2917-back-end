@@ -22,9 +22,11 @@ model User {
   password String
 
   phone String @default("")
-  name String
+  name String @default("")
+  birthdate String @default("")
 
   orders Order[]
+  feedbacks Feedback[]
 }
 
 model Product {
@@ -51,32 +53,37 @@ model Category {
   updatedAt DateTime @updatedAt @map("updated_at")
   
   name String @unique
+  slug String @unique
+
   products Product[]
 }
 
-model Address {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+// model Address {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
 
-  township    String
-  street      String
-  house       String
-  flat        Int
+//   township    String
+//   street      String
+//   house       String
+//   flat        Int
 
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   Int      @map("order_id") @unique
-}
+//   order     Order    @relation(fields: [orderId], references: [id])
+//   orderId   Int      @map("order_id") @unique
+// }
 
 model Order {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  
+  amount Int
 
   status EnumOrderStatus @default(PENDING)
   items OrderItem[]
+  address String
 
-  deliveryAddress Address?
+  // deliveryAddress Address?
 
   user      User @relation(fields: [userId], references: [id])
   userId    Int  @map("user_id")
@@ -96,6 +103,19 @@ model OrderItem {
 
   product      Product @relation(fields: [productId], references: [id])
   productId    Int     @map("product_id")
+
+  @@map("Order_item")
+}
+
+model Feedback {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    text String
+
+    user      User @relation(fields: [userId], references: [id])
+    userId    Int  @map("user_id")
 }
 
 
