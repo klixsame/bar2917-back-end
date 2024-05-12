@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { GetAllProductDto } from './dto/get-all.product.dto';
+import { ProductDto } from './dto/product.dto';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
-  }
-
+  @UsePipes(new ValidationPipe())
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  async getAll(@Query() queryDto: GetAllProductDto) {
+    return this.productService.getAll(queryDto)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  @Get('similar/:id')
+  async getSimilar(@Param('id') id: string) {
+    return this.productService.getSimilar(+id)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  @Get('by-slug/:slug')
+  async getProductBySlug(@Param('slug') slug: string) {
+    return this.productService.bySlug(slug)
   }
 
+  @Get('by-category/:categorySlug')
+  async getProductByCategory(@Param('categorySlug') categorySlug: string) {
+    return this.productService.byCategory(categorySlug)
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Auth()
+  @Post()
+  async createProduct(){
+    return this.productService.create()
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Put(':id')
+  @Auth()
+  async updateProduct(@Param('id') id: string, @Body() dto: ProductDto) {
+    return this.productService.update(+id, dto)
+  }
+
+  @HttpCode(200)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
+  @Auth()
+  async deleteProduct(@Param('id') id: string) {
+    return this.productService.delete(+id)
   }
 }

@@ -39,7 +39,7 @@ model Product {
   description String
   price Int
   image String
-  weight Int
+  weight Float
 
   orderItems OrderItem[]
 
@@ -77,7 +77,7 @@ model Order {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   
-  amount Int
+  // amount Int
 
   status EnumOrderStatus @default(PENDING)
   items OrderItem[]
