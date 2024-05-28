@@ -135,7 +135,7 @@ export class ProductService {
     });
     
     if (!category) {
-      throw new NotFoundException('Category not found when trying to create a product');
+      throw new NotFoundException('Не найдена категория при попытке создать продукт');
     }
     
     const product = await this.prisma.product.create({

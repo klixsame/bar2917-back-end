@@ -31,13 +31,12 @@ export class CategoryController {
     return this.categoryService.updateCategory(+id, dto);
   }
 
+  @Post()
   @HttpCode(200)
   @Auth()
-  @Post()
-  async create() {
-    return this.categoryService.createCategory();
+  async create(@Body() categoryDto: CategoryDto) {
+    return this.categoryService.createCategory(categoryDto);
   }
-
 
   @HttpCode(200)
   @Auth()

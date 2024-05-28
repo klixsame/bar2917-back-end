@@ -1,11 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import { register } from 'module';
-import { AuthDto } from './dto/auth.dto';
 import { faker } from '@faker-js/faker';
-import { hash, verify } from 'argon2';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import { hash, verify } from 'argon2';
+import { PrismaService } from 'src/prisma.service';
+import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
