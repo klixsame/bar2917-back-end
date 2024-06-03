@@ -13,6 +13,7 @@ model User {
   updatedAt DateTime   @updatedAt @map("updated_at")
   email     String     @unique
   password  String
+  isAdmin   Boolean    @default(false) @map("is_admin")
   phone     String     @default("")
   name      String     @default("")
   birthdate String     @default("")
@@ -29,7 +30,7 @@ model Product {
   description String
   price       Int
   image       String
-  weight      Float
+  weight      Int
   categoryId  Int?        @map("category_id")
   orderItems  OrderItem[]
   category    Category?   @relation(fields: [categoryId], references: [id])
@@ -50,6 +51,7 @@ model Order {
   updatedAt DateTime        @updatedAt @map("updated_at")
   status    EnumOrderStatus @default(PENDING)
   address   String
+  commentary   String?      
   userId    Int             @map("user_id")
   user      User            @relation(fields: [userId], references: [id])
   items     OrderItem[]
@@ -83,4 +85,5 @@ enum EnumOrderStatus {
   PAYED
   SHIPPED
   DELIVERED
+  CANCELED
 }
