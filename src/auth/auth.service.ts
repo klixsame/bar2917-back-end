@@ -75,7 +75,7 @@ export class AuthService {
     });
 
     const refreshToken = this.jwt.sign(data,{
-      expiresIn: '5d',
+      expiresIn: '3d',
     });
 
     return {accessToken, refreshToken}
