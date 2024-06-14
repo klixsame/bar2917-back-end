@@ -52,6 +52,7 @@ model Order {
   status    EnumOrderStatus @default(PENDING)
   address   String
   commentary   String?      
+  total     Int
   userId    Int             @map("user_id")
   user      User            @relation(fields: [userId], references: [id])
   items     OrderItem[]
