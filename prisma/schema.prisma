@@ -16,7 +16,6 @@ model User {
   isAdmin   Boolean    @default(false) @map("is_admin")
   phone     String     @default("")
   name      String     @default("")
-  birthdate String     @default("")
   feedbacks Feedback[]
   orders    Order[]
 }
@@ -51,7 +50,7 @@ model Order {
   updatedAt DateTime        @updatedAt @map("updated_at")
   status    EnumOrderStatus @default(PENDING)
   address   String
-  commentary   String?      
+  commentary   String?      @default("нет")
   total     Int
   userId    Int             @map("user_id")
   user      User            @relation(fields: [userId], references: [id])
