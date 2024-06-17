@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
@@ -53,8 +52,8 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
-        name: faker.person.firstName(),
-        phone: faker.phone.number('+7 (###) ###-##-##'),
+        name: '',
+        phone: '',
         password: await hash(dto.password)
       }
     })
