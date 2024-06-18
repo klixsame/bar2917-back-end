@@ -64,6 +64,8 @@ export class OrderService {
         status: dto.status,
         address: dto.address,
         commentary: dto.commentary,
+        deliveryDate: dto.deliveryDate,
+        deliveryTime: dto.deliveryTime,
         total,
         items: {
           create: dto.items

@@ -53,7 +53,6 @@ export class AuthService {
       data: {
         email: dto.email,
         name: '',
-        phone: '',
         password: await hash(dto.password)
       }
     })

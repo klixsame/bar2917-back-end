@@ -7,6 +7,7 @@ export class OrderDto {
     @IsEnum(EnumOrderStatus)
     status: EnumOrderStatus
 
+
     @IsString()
     address: string
 
@@ -18,6 +19,12 @@ export class OrderDto {
     @ValidateNested({each: true})
     @Type(() => OrderItemDto)
     items: OrderItemDto[]
+
+    @IsString()
+    deliveryDate: string
+
+    @IsString()
+    deliveryTime: string
 }
 
 export class OrderItemDto {

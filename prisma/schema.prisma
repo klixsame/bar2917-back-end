@@ -14,7 +14,7 @@ model User {
   email     String     @unique
   password  String
   isAdmin   Boolean    @default(false) @map("is_admin")
-  phone     String     @default("")
+  phone     String?    @unique
   name      String     @default("")
   feedbacks Feedback[]
   orders    Order[]
@@ -52,6 +52,8 @@ model Order {
   address   String
   commentary   String?      @default("нет")
   total     Int
+  deliveryDate String
+  deliveryTime String
   userId    Int             @map("user_id")
   user      User            @relation(fields: [userId], references: [id])
   items     OrderItem[]

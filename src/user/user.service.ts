@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import { returnUserObject } from './return-user.object';
 import { Prisma } from '@prisma/client';
 import { hash } from 'argon2';
+import { PrismaService } from 'src/prisma.service';
+import { returnUserObject } from './return-user.object';
 
 @Injectable()
 export class UserService {
@@ -45,6 +45,20 @@ export class UserService {
         password: dto.password ? await hash(dto.password) : user.password
       }
     });
+  }
+
+  async getAllPhones() {
+    const users = await this.prisma.user.findMany({
+      select: {
+        id: true,
+        phone: true
+      }
+    });
+  
+    return users.map(user => ({
+      id: user.id,
+      phone: user.phone
+    }));
   }
   
 }

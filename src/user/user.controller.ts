@@ -22,4 +22,11 @@ export class UserController {
     return this.userService.updateProfile(id, dto);
   }
 
+  @HttpCode(200)
+  @Auth()
+  @Get('phones')
+  async getAllPhones() {
+    return this.userService.getAllPhones();
+  }
+
 }
