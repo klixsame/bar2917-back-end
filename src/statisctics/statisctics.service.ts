@@ -1,47 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class StatiscticsService {
     constructor(
-        private prisma: PrismaService,
-        private userService: UserService
+        private prisma: PrismaService
     ) {}
 
-    async totalUsers() {
-        return this.prisma.user.count();
-    }
+    async getMain() {
+        const ordersCount = await this.prisma.order.count()
+        const feedbackCount = await this.prisma.feedback.count()
+        const usersCount = await this.prisma.user.count()
 
-    async getMain(userId: number) {
-        const user = await this.userService.byId(userId, {
-            orders: {
-                select: {
-                    items: true,
-                }
-            },
-            feedbacks: true
-        });
+        const totalAmount = await this.prisma.order.aggregate({
+            _sum: {
+                total: true
+            }
+        })
 
-    //     const totalAmount = await this.prisma.$queryRaw`
-    //     SELECT SUM(amount * 1) as total_amount
-    //     FROM Order
-    //     WHERE userId = ${userId}
-    // `;
+        // const user = await this.userService.byId(userId, {
+        //     orders: {
+        //         select: {
+        //             items: true,
+        //         }
+        //     },
+        //     feedbacks: true
+        // });
 
     // Создаем массив объектов с информацией о заказах пользователя, обратной связи и общей сумме заказов
     const statistics = [
         {
-            name: 'Orders',
-            value: user.orders.length
+            name: 'Заказы',
+            value: ordersCount
         },
         {
-            name: 'Feedbacks',
-            value: user.feedbacks.length
+            name: 'Обратная связь',
+            value: feedbackCount
         },
         {
-            name: 'Total amount',
-            value: 1000
+            name: 'Пользователи',
+            value: usersCount
+        },
+        {
+            name: 'Общая сумма заказов',
+            value: `${totalAmount._sum.total} ₽`
         }
     ];
 

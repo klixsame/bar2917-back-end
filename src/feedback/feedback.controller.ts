@@ -10,6 +10,7 @@ export class FeedbackController {
 
   @UsePipes(new ValidationPipe())
   @Get()
+  @Auth('admin')
   async getAll() {
     return this.feedbackService.getAllFeedbacks();
   }

@@ -9,9 +9,8 @@ import { PaymentStatusDto } from './payment-status.dto';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-
   @Get()
-  @Auth('admin')
+  @Auth()
   getAll() {
     return this.orderService.getAllOrders()
   }

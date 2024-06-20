@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -12,12 +11,13 @@ import { PrismaService } from './prisma.service';
 import { ProductModule } from './product/product.module';
 import { StatiscticsModule } from './statisctics/statisctics.module';
 import { UserModule } from './user/user.module';
+import { path } from 'app-root-path';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'assets'), // Правильно используйте join для построения пути
+      rootPath: `${path}/assets`, 
       serveRoot: '/assets', // Укажите URL-префикс для доступа к статическим файлам
     }),
     AuthModule,
