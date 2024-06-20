@@ -88,7 +88,7 @@ export class OrderService {
       },
       confirmation: {
         type:'redirect',
-        return_url: 'http://localhost:3000/thanks'
+        return_url: 'http://31.128.41.46:3000/thanks'
       },
       description: `Заказ #${order.id}`
     })
