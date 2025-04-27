@@ -52,7 +52,28 @@ export class OrderService {
     })
   }
 
-  async placeOrder(dto: OrderDto, userId: number) {
+  async getByLocationId(locationId: number) {
+    return this.prisma.order.findMany({
+      where: {
+        locationId  
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        items: {  
+          include: {
+            product: {
+              select: productReturnObject
+            }
+          }
+        }
+      } 
+    })
+  }
+  
+
+  async placeOrder(dto: OrderDto, userId: number, locationId: number) {
     const deliveryPrice = 100;
 
     const total = dto.items.reduce((acc, item) => {
@@ -67,6 +88,11 @@ export class OrderService {
         deliveryDate: dto.deliveryDate,
         deliveryTime: dto.deliveryTime,
         total,
+        location: {
+          connect: {
+            id: locationId
+          }
+        },
         items: {
           create: dto.items
         },

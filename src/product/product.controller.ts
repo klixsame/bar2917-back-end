@@ -14,9 +14,9 @@ export class ProductController {
     return this.productService.getAll(queryDto)
   }
 
-  @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.productService.byId(+id);
+  @Get('by-slug/:slug')
+  async getProductBySlug(@Param('slug') slug: string) {
+    return this.productService.bySlug(slug)
   }
 
   @Get('similar/:id')
@@ -24,14 +24,14 @@ export class ProductController {
     return this.productService.getSimilar(+id)
   }
 
-  @Get('by-slug/:slug')
-  async getProductBySlug(@Param('slug') slug: string) {
-    return this.productService.bySlug(slug)
-  }
-
   @Get('by-category/:categorySlug')
   async getProductByCategory(@Param('categorySlug') categorySlug: string) {
     return this.productService.byCategory(categorySlug)
+  }
+
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return this.productService.byId(+id);
   }
 
   @UsePipes(new ValidationPipe())
@@ -55,5 +55,13 @@ export class ProductController {
   @Auth()
   async deleteProduct(@Param('id') id: string) {
     return this.productService.delete(+id)
+  }
+
+  @Get('price/:productId/:locationId')
+  async getProductPrice(
+    @Param('productId') productId: string,
+    @Param('locationId') locationId: string
+  ) {
+    return this.productService.getProductPrice(+productId, +locationId);
   }
 }

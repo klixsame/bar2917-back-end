@@ -12,22 +12,25 @@ export class ProductService {
 
   
   async getAll(dto: GetAllProductDto) {
-    const {sort, searchTerm} = dto;
+    const {sort, searchTerm, locationId} = dto;
 
-    const prismaSort:Prisma.ProductOrderByWithRelationInput[] = []
+    // Проверяем существование локации
+    const location = await this.prisma.location.findUnique({
+      where: { id: locationId }
+    });
 
-    if(sort === EnumProductSort.LOW_PRICE){
-      prismaSort.push({price: 'asc'})
+    if (!location) {
+      throw new NotFoundException('Локация не найдена');
     }
-    else if(sort === EnumProductSort.HIGH_PRICE){
-      prismaSort.push({price: 'desc'})
-    }
-    else if(sort === EnumProductSort.NEWEST){
-      prismaSort.push({createdAt: 'desc'})
-    }
-    else{
-      prismaSort.push({createdAt: 'asc'})
-    }
+
+    // Формируем условия фильтрации
+    const where: Prisma.ProductWhereInput = {
+      locations: {
+        some: {
+          locationId: locationId // Только товары, доступные в этой локации
+        }
+      }
+    };
 
     const prismaSearchTermFilter:Prisma.ProductWhereInput = searchTerm ? {
       OR: [
@@ -43,10 +46,40 @@ export class ProductService {
     } : {}
 
     const products = await this.prisma.product.findMany({
-      where: prismaSearchTermFilter,
-      orderBy: prismaSort, 
-      select: productReturnObject
-    })
+      where: {
+        ...where,
+        ...prismaSearchTermFilter
+      },
+      include: {
+        locations: {
+          where: {
+            locationId: locationId
+          },
+          select: {
+            price: true
+          }
+        }
+      }
+    });
+
+    // Сортируем продукты по цене в памяти
+    if (sort === EnumProductSort.LOW_PRICE) {
+      products.sort((a, b) => {
+        const priceA = a.locations[0]?.price || 0;
+        const priceB = b.locations[0]?.price || 0;
+        return priceA - priceB;
+      });
+    } else if (sort === EnumProductSort.HIGH_PRICE) {
+      products.sort((a, b) => {
+        const priceA = a.locations[0]?.price || 0;
+        const priceB = b.locations[0]?.price || 0;
+        return priceB - priceA;
+      });
+    } else if (sort === EnumProductSort.NEWEST) {
+      products.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    } else {
+      products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    }
 
     return {
       products,
@@ -129,7 +162,6 @@ export class ProductService {
   }
   
   async create(categoryId: number) {
-
     // Проверяем существование категории
     const category = await this.prisma.category.findUnique({
       where: { id: categoryId }
@@ -143,35 +175,38 @@ export class ProductService {
       data: {
         name: '',
         slug: '',
-        price: 0,
         description: '',
         image: '',
         weight: 0
       }
-    })
+    });
 
-    return product.id
+    return product.id;
   }
 
   async update(id: number, dto: ProductDto) {
-  
-    const { name, price, image, description, categoryId } = dto
+    const { name, image, description, categoryId, items } = dto;
 
     return this.prisma.product.update({
       where: { id },
       data: {
         description,
         image,
-        price,
         name,
         slug: slugify(name).toLowerCase(),
         category: {
           connect: {
             id: categoryId
           }
+        },
+        locations: {
+          create: items.map(item => ({
+            price: item.price,
+            locationId: item.locationId
+          }))
         }
       }
-    })
+    });
   }
 
   async delete(id: number) {
@@ -181,5 +216,29 @@ export class ProductService {
     })
   }
 
+  async getProductPrice(productId: number, locationId: number) {
+    const productLocation = await this.prisma.productLocation.findUnique({
+      where: {
+        productId_locationId: {
+          productId,
+          locationId
+        }
+      },
+      select: {
+        price: true,
+        isAvailable: true
+      }
+    });
+
+    if (!productLocation) {
+      throw new NotFoundException('Цена для данного продукта в указанной локации не найдена');
+    }
+
+    if (!productLocation.isAvailable) {
+      throw new NotFoundException('Продукт недоступен в данной локации');
+    }
+
+    return productLocation.price;
+  }
 
 }

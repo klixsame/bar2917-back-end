@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from "class-validator"
+import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator"
 
 export enum EnumProductSort {
     HIGH_PRICE = 'high-price',
@@ -15,4 +15,7 @@ export class GetAllProductDto {
     @IsOptional()
     @IsString()
     searchTerm?: string
+
+    @IsNumber()
+    locationId: number
 }

@@ -9,30 +9,59 @@ datasource db {
 
 model User {
   id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
   email     String     @unique
   password  String
   isAdmin   Boolean    @default(false) @map("is_admin")
   phone     String?    @unique
   name      String     @default("")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
   feedbacks Feedback[]
   orders    Order[]
 }
 
-model Product {
-  id          Int         @id @default(autoincrement())
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
-  name        String      @unique
-  slug        String      @unique
-  description String
+model Location {
+  id        Int               @id @default(autoincrement())
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  address   String            @unique
+  name      String?
+  isActive  Boolean           @default(true) @map("is_active")
+  isDefault Boolean?          @default(false) @map("is_default")
+  phone     String            @unique(map: "location_unique")
+  orders    Order[]
+  products  ProductLocation[]
+}
+
+model ProductLocation {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  isAvailable Boolean  @default(true) @map("is_available")
+  locationId  Int      @map("location_id")
+  productId   Int      @map("product_id")
   price       Int
+  location    Location @relation(fields: [locationId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@unique([productId, locationId])
+  @@map("Product_location")
+}
+
+model Product {
+  id          Int               @id @default(autoincrement())
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  name        String            @unique
+  slug        String            @unique
+  description String
   image       String
   weight      Int
-  categoryId  Int?        @map("category_id")
+  categoryId  Int?              @map("category_id")
+  isActive    Boolean           @default(true) @map("is_active")
   orderItems  OrderItem[]
-  category    Category?   @relation(fields: [categoryId], references: [id])
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  locations   ProductLocation[]
 }
 
 model Category {
@@ -45,18 +74,20 @@ model Category {
 }
 
 model Order {
-  id        Int             @id @default(autoincrement())
-  createdAt DateTime        @default(now()) @map("created_at")
-  updatedAt DateTime        @updatedAt @map("updated_at")
-  status    EnumOrderStatus @default(PENDING)
-  address   String
-  commentary   String?      @default("нет")
-  total     Int
+  id           Int             @id @default(autoincrement())
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  status       EnumOrderStatus @default(PENDING)
+  address      String
+  commentary   String?         @default("нет")
+  total        Int
   deliveryDate String
   deliveryTime String
-  userId    Int             @map("user_id")
-  user      User            @relation(fields: [userId], references: [id])
-  items     OrderItem[]
+  userId       Int             @map("user_id")
+  locationId   Int             @map("location_id")
+  location     Location        @relation(fields: [locationId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
+  items        OrderItem[]
 }
 
 model OrderItem {

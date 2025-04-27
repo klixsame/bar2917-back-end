@@ -5,13 +5,26 @@ import { returnCategoryObject } from "src/category/return-category.object";
 export const productReturnObject: Prisma.ProductSelect = {
     id: true,
     name: true,
+    slug: true,
     description: true,
-    price: true,
     image: true,
     weight: true,
+    isActive: true,
     createdAt: true,
-    slug: true,
-    category: { select: returnCategoryObject }
+    category: { select: returnCategoryObject },
+    locations: {
+        select: {
+            price: true,
+            isAvailable: true,
+            location: {
+                select: {
+                    id: true,
+                    name: true,
+                    address: true
+                }
+            }
+        }
+    }
 }
 
 export const productReturnObjectFullest: Prisma.ProductSelect = {
